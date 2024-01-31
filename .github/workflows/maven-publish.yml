@@ -18,7 +18,7 @@ jobs:
           distribution: adopt
      
       - name: Build, test and package project
-        working-directory: ./
+        working-directory: ./S2-NewAnomliesAPI
         run: mvn package -DskipTests
 
       - name: Docker login
