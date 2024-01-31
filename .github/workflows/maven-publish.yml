@@ -18,14 +18,14 @@ jobs:
           distribution: adopt
      
       - name: Build, test and package project
-        working-directory: ./S2-NewAnomalyAPI
+        working-directory: ./S2-NewAnomaliesAPI
         run: mvn package -DskipTests
 
       - name: Docker login
         run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Docker Build
-        run: docker build -t ${{ secrets.DOCKER_USER }}/newanomalyapi:latest ./S2-NewAnomalyAPI
+        run: docker build -t ${{ secrets.DOCKER_USER }}/newanomaliesapi:latest ./S2-NewAnomalyAPI
 
       - name: Upload container to Docker Hub with Push
-        run: docker push ${{ secrets.DOCKER_USER }}/newanomalyapi:latest
+        run: docker push ${{ secrets.DOCKER_USER }}/newanomaliesapi:latest
