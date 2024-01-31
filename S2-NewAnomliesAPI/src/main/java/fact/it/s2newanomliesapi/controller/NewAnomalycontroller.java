@@ -16,8 +16,10 @@ public class NewAnomalycontroller {
     @ResponseStatus(HttpStatus.OK)
     public void addAnomaly(@ModelAttribute AnomalyRequest data, @RequestParam("file") MultipartFile file) {
         try {
-            anomalyService.addAnomaly(data, file.getOriginalFilename());
-            amazonClient.uploadFile(data.getTimestamp(), file);
+            boolean exists = anomalyService.addAnomaly(data, file.getOriginalFilename());
+            if (!exists) {
+                amazonClient.uploadFile(data.getTimestamp(), file);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

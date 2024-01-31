@@ -31,7 +31,7 @@ public class AnomalyService {
         return typeEquals && distance <= thresholdDistance;
     }
 
-    public void addAnomaly(AnomalyRequest anomalyRequest, String fileName) {
+    public boolean addAnomaly(AnomalyRequest anomalyRequest, String fileName) {
         Coordinate coordinate = new Coordinate(Double.parseDouble(anomalyRequest.getLongitude()), Double.parseDouble(anomalyRequest.getLatitude()));
         Point anomalyPoint = geometryFactory.createPoint(coordinate);
         Anomaly closestAnomaly = anomalyRepository.findClosestAnomaly(anomalyPoint, anomalyRequest.getAnomalyType());
@@ -44,11 +44,14 @@ public class AnomalyService {
         if (closestAnomaly != null) {
             // Check if the closest anomaly is within the threshold distance and that both anomalies have the same anomaly type
             if (isSame(coordinate, closestAnomaly.getAnomalyLocation().getCoordinate(), thresholdDistance, closestAnomaly.getAnomalyType().getName(), anomalyRequest.getAnomalyType())) {
-                //increment the number of detections of that anomaly
-                int count = closestAnomaly.getCount() + 1;
-                //closestAnomaly.setId(closestAnomaly.getId()); //prevents the creating of a new anomaly
-                closestAnomaly.setCount(count);
-                anomalyRepository.save(closestAnomaly);
+                if (anomalyRequest.getAnomalyType().equals("Vegetation")) {
+                    //increment the number of detections of that anomaly
+                    int count = closestAnomaly.getCount() + 1;
+                    //closestAnomaly.setId(closestAnomaly.getId()); //prevents the creating of a new anomaly
+                    closestAnomaly.setCount(count);
+                    anomalyRepository.save(closestAnomaly);
+                }
+                return true;
             } else {
                 // create new anomaly
                 Anomaly anomaly = new Anomaly();
@@ -79,5 +82,6 @@ public class AnomalyService {
                 anomalyRepository.save(anomaly);
             }
         }
+        return false;
     }
 }
