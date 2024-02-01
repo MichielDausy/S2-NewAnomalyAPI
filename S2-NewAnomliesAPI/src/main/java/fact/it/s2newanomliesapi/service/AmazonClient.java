@@ -22,8 +22,6 @@ import java.time.OffsetDateTime;
 @Service
 public class AmazonClient {
     private AmazonS3 s3client;
-    @Value("${amazonProperties.endpointUrl}")
-    private String endpointUrl;
     @Value("${amazonProperties.bucketName}")
     private String bucketName;
     @Value("${amazonProperties.accessKey}")
@@ -55,17 +53,14 @@ public class AmazonClient {
     private void uploadFileTos3bucket(String fileName, File file) {
         s3client.putObject(new PutObjectRequest(bucketName, fileName, file));
     }
-    public String uploadFile(OffsetDateTime date, MultipartFile multipartFile) {
-        String fileUrl = "";
+    public void uploadFile(OffsetDateTime date, MultipartFile multipartFile) {
         try {
             File file = convertMultiPartToFile(multipartFile);
             String fileName = generateFileName(date, multipartFile);
-            fileUrl = endpointUrl + "/" + bucketName + "/" + fileName;
             uploadFileTos3bucket(fileName, file);
             file.delete();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return fileUrl;
     }
 }

@@ -19,15 +19,14 @@ public class NewAnomalycontroller {
 
     @PostMapping("/new")
     @ResponseStatus(HttpStatus.OK)
-    public String addAnomaly(@ModelAttribute AnomalyRequest data, @RequestParam("file") MultipartFile file) {
+    public void addAnomaly(@ModelAttribute AnomalyRequest data, @RequestParam("file") MultipartFile file) {
         try {
             boolean exists = anomalyService.addAnomaly(data, file.getOriginalFilename());
             if (!exists) {
-                return amazonClient.uploadFile(data.getTimestamp(), file);
+                amazonClient.uploadFile(data.getTimestamp(), file);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "location already exists";
     }
 }
