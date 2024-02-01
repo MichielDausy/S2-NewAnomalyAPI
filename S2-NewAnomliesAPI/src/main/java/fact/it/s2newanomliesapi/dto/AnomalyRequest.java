@@ -10,7 +10,6 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AnomalyRequest {
-    private Integer id;
     private OffsetDateTime timestamp;
     private String longitude;
     private String latitude;

@@ -11,8 +11,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.OffsetDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,12 @@ public class AnomalyService {
     private final TrainRepository trainRepository;
     private final TrainTrackRepository trainTrackRepository;
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326); //4326 is used for longitude and latitude coordinate systems
+    @Value("${amazonProperties.endpointUrl}")
+    private String endpointUrl;
+    @Value("${amazonProperties.bucketName}")
+    private String bucketName;
+    private String fileURL = endpointUrl + "/" + bucketName + "/";
+
 
     private boolean isSame(Coordinate coord1, Coordinate coord2, double thresholdDistance, String anomalyType1, String anomalyType2) {
         double distance = coord1.distance(coord2);
@@ -31,10 +39,15 @@ public class AnomalyService {
         return typeEquals && distance <= thresholdDistance;
     }
 
+    private String generateFileName(OffsetDateTime date, String filename) {
+        return date + "-" + filename.replace(" ", "_");
+    }
+
     public boolean addAnomaly(AnomalyRequest anomalyRequest, String fileName) {
         Coordinate coordinate = new Coordinate(Double.parseDouble(anomalyRequest.getLongitude()), Double.parseDouble(anomalyRequest.getLatitude()));
         Point anomalyPoint = geometryFactory.createPoint(coordinate);
         Anomaly closestAnomaly = anomalyRepository.findClosestAnomaly(anomalyPoint, anomalyRequest.getAnomalyType());
+        String newFileName = generateFileName(anomalyRequest.getTimestamp(), fileName);
 
         // Define a threshold distance
         double thresholdDistanceMeters = 5.0;
@@ -56,7 +69,8 @@ public class AnomalyService {
                 // create new anomaly
                 Anomaly anomaly = new Anomaly();
                 anomaly.setTimestamp(anomalyRequest.getTimestamp());
-                anomaly.setPhoto(fileName);
+                fileURL += newFileName;
+                anomaly.setPhoto(fileURL);
                 anomaly.setCount(1);
                 anomaly.setIsFixed(false);
                 anomaly.setIsFalse(false);
