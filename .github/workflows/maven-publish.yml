@@ -25,7 +25,7 @@ jobs:
         run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Docker Build
-        run: docker build -t ${{ secrets.DOCKER_USER }}/newanomaliesapilocalhost:latest ./S2-NewAnomliesAPI
+        run: docker build -t ${{ secrets.DOCKER_USER }}/newanomaliesapi:latest ./S2-NewAnomliesAPI
 
       - name: Upload container to Docker Hub with Push
-        run: docker push ${{ secrets.DOCKER_USER }}/newanomaliesapilocalhost:latest
+        run: docker push ${{ secrets.DOCKER_USER }}/newanomaliesapi:latest
