@@ -47,7 +47,6 @@ public class AnomalyService {
         Coordinate coordinate = new Coordinate(Double.parseDouble(anomalyRequest.getLongitude()), Double.parseDouble(anomalyRequest.getLatitude()));
         Point anomalyPoint = geometryFactory.createPoint(coordinate);
         Anomaly closestAnomaly = anomalyRepository.findClosestAnomaly(anomalyPoint, anomalyRequest.getAnomalyType());
-        String newFileName = generateFileName(anomalyRequest.getTimestamp(), fileName);
 
         // Define a threshold distance
         double thresholdDistanceMeters = 5.0;
@@ -69,8 +68,8 @@ public class AnomalyService {
                 // create new anomaly
                 Anomaly anomaly = new Anomaly();
                 anomaly.setTimestamp(anomalyRequest.getTimestamp());
-                fileURL += newFileName;
-                anomaly.setPhoto(fileURL);
+                String newFileName = generateFileName(anomalyRequest.getTimestamp(), fileName);
+                anomaly.setPhoto(newFileName);
                 anomaly.setCount(1);
                 anomaly.setIsFixed(false);
                 anomaly.setIsFalse(false);
