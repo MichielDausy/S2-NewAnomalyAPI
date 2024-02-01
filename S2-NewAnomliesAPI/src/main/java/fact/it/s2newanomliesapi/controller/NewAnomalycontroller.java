@@ -22,7 +22,7 @@ public class NewAnomalycontroller {
     public String addAnomaly(@ModelAttribute AnomalyRequest data, @RequestParam("file") MultipartFile file) {
         try {
             boolean exists = anomalyService.addAnomaly(data, file.getOriginalFilename());
-            if (exists) {
+            if (!exists) {
                 return amazonClient.uploadFile(data.getTimestamp(), file);
             }
         } catch (Exception e) {
