@@ -24,7 +24,7 @@ public class Anomaly {
     private OffsetDateTime timestamp;
     @Column(columnDefinition = "geometry(Point,4326)")
     private Point anomalyLocation;
-    private String photo;
+    private String photo = "DefaultImage.png";
     private Boolean isFixed;
     private Boolean isFalse;
     private Integer count;
