@@ -1,6 +1,7 @@
 package fact.it.s2newanomliesapi.service;
 
 import fact.it.s2newanomliesapi.dto.AnomalyRequest;
+import fact.it.s2newanomliesapi.dto.AnomalyResponse;
 import fact.it.s2newanomliesapi.model.Anomaly;
 import fact.it.s2newanomliesapi.model.AnomalyType;
 import fact.it.s2newanomliesapi.model.Train;
@@ -43,7 +44,15 @@ public class AnomalyService {
         return date + "-" + filename.replace(" ", "_");
     }
 
-    public boolean addAnomaly(AnomalyRequest anomalyRequest, String fileName) {
+    private AnomalyResponse mapToResponse(Anomaly anomaly) {
+        return AnomalyResponse.builder()
+                .photo(anomaly.getPhoto())
+                .timestamp(anomaly.getTimestamp())
+                .anomalyLocation(anomaly.getAnomalyLocation().toString())
+                .build();
+    }
+
+    public AnomalyResponse addAnomaly(AnomalyRequest anomalyRequest, String fileName) {
         Coordinate coordinate = new Coordinate(Double.parseDouble(anomalyRequest.getLongitude()), Double.parseDouble(anomalyRequest.getLatitude()));
         Point anomalyPoint = geometryFactory.createPoint(coordinate);
         Anomaly closestAnomaly = anomalyRepository.findClosestAnomaly(anomalyPoint, anomalyRequest.getAnomalyType());
@@ -59,11 +68,10 @@ public class AnomalyService {
                 if (anomalyRequest.getAnomalyType().equals("Vegetation")) {
                     //increment the number of detections of that anomaly
                     int count = closestAnomaly.getCount() + 1;
-                    //closestAnomaly.setId(closestAnomaly.getId()); //prevents the creating of a new anomaly
                     closestAnomaly.setCount(count);
                     anomalyRepository.save(closestAnomaly);
                 }
-                return true;
+                return mapToResponse(closestAnomaly);
             } else {
                 // create new anomaly
                 Anomaly anomaly = new Anomaly();
@@ -93,8 +101,9 @@ public class AnomalyService {
                 anomaly.setCountry(countryRepository.findByGeometryContains(anomalyLocation));
 
                 anomalyRepository.save(anomaly);
+                return mapToResponse(anomaly);
             }
         }
-        return false;
+        return null;
     }
 }

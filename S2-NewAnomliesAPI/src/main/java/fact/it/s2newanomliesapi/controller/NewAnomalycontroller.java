@@ -1,6 +1,7 @@
 package fact.it.s2newanomliesapi.controller;
 
 import fact.it.s2newanomliesapi.dto.AnomalyRequest;
+import fact.it.s2newanomliesapi.dto.AnomalyResponse;
 import fact.it.s2newanomliesapi.service.AmazonClient;
 import fact.it.s2newanomliesapi.service.AnomalyService;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +18,14 @@ public class NewAnomalycontroller {
 
     @PostMapping("/new")
     @ResponseStatus(HttpStatus.OK)
-    public void addAnomaly(@ModelAttribute AnomalyRequest data, @RequestParam("file") MultipartFile file) {
+    public AnomalyResponse addAnomaly(@ModelAttribute AnomalyRequest data, @RequestParam("file") MultipartFile file) {
         try {
-            boolean exists = anomalyService.addAnomaly(data, file.getOriginalFilename());
-            if (!exists) {
-                amazonClient.uploadFile(data.getTimestamp(), file);
-            }
+            AnomalyResponse anomalyResponse = anomalyService.addAnomaly(data, file.getOriginalFilename());
+            amazonClient.uploadFile(data.getTimestamp(), file);
+            return anomalyResponse;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 }
